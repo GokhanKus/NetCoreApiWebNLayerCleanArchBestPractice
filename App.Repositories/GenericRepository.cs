@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 namespace App.Repositories;
 public class GenericRepository<T>(AppDbContext context) : IGenericRepository<T> where T : class
 {
+	protected readonly AppDbContext _context = context;
 	private readonly DbSet<T> _dbSet = context.Set<T>();
 	public IQueryable<T> Where(Expression<Func<T, bool>> predicate) => _dbSet.Where(predicate).AsQueryable().AsNoTracking();
 	public IQueryable<T> GetAll() => _dbSet.AsQueryable().AsNoTracking();
