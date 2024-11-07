@@ -1,11 +1,19 @@
 ﻿using App.Repositories;
 using App.Repositories.Products;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 
 namespace App.Services.Products;
 public class ProductService(IProductRepository productRepository, IUnitOfWork unitOfWork) : IProductService
 {
+	public async Task<ServiceResult<List<ProductDto>>> GetAllAsync()
+	{
+		//List<> tipinde bir sey alirken null kontrolü yapmasak da olur gelmezse bos liste gelecektir if ile kalabalik yapilmayabilir
+		var products = await productRepository.GetAll().ToListAsync();
+		var productsDto = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Stock)).ToList();
+		return ServiceResult<List<ProductDto>>.Success(productsDto);
+	}
 	public async Task<ServiceResult<List<ProductDto>>> GetTopPriceProductsAsync(int count)
 	{
 		var products = await productRepository.GetTopPriceProductAsync(count);
@@ -16,7 +24,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 		var productDto = products!.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Stock)).ToList();
 		return ServiceResult<List<ProductDto>>.Success(productDto);
 	}
-	public async Task<ServiceResult<ProductDto>> GetProductByIdAsync(int id)
+	public async Task<ServiceResult<ProductDto?>> GetByIdAsync(int id)
 	{
 		var product = await productRepository.GetByIdAsync(id);
 
@@ -24,9 +32,9 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 			ServiceResult<ProductDto>.Fail("product not found", HttpStatusCode.NotFound);
 
 		var productDto = new ProductDto(product!.Id, product.Name, product.Price, product.Stock);
-		return ServiceResult<ProductDto>.Success(productDto!);
+		return ServiceResult<ProductDto>.Success(productDto)!;
 	}
-	public async Task<ServiceResult<CreateProductResponse>> CreateProductAsync(CreateProductRequest request)
+	public async Task<ServiceResult<CreateProductResponse>> CreateAsync(CreateProductRequest request)
 	{
 		var product = new Product
 		{
@@ -39,7 +47,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 		await unitOfWork.SaveChangesAsync();
 		return ServiceResult<CreateProductResponse>.Success(new CreateProductResponse(product.Id), HttpStatusCode.Created);
 	}
-	public async Task<ServiceResult> UpdateProductAsync(int id, UpdateProductRequest request)
+	public async Task<ServiceResult> UpdateAsync(int id, UpdateProductRequest request)
 	{
 		//update ve delete islemlerinde geriye bir sey donulmez 204 yani no content donebiliriz
 		#region Fast Fail & Guard Clauses
@@ -67,7 +75,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 		await unitOfWork.SaveChangesAsync();
 		return ServiceResult.Success(HttpStatusCode.NoContent);
 	}
-	public async Task<ServiceResult> DeleteProductAsync(int id)
+	public async Task<ServiceResult> DeleteAsync(int id)
 	{
 		var product = await productRepository.GetByIdAsync(id);
 
@@ -78,4 +86,6 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 		await unitOfWork.SaveChangesAsync();
 		return ServiceResult.Success(HttpStatusCode.NoContent);
 	}
+
+
 }
