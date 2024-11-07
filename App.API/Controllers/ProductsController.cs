@@ -11,7 +11,7 @@ public class ProductsController(IProductService productService) : CustomBaseCont
 		return CreateActionResult(serviceResult);
 	}
 	
-	[HttpGet]
+	[HttpGet("{id}")] 
 	public async Task<IActionResult> GetByIdAsync(int id)
 	{
 		var serviceResult = await productService.GetByIdAsync(id);
@@ -25,14 +25,14 @@ public class ProductsController(IProductService productService) : CustomBaseCont
 		return CreateActionResult(serviceResult);
 	}
 
-	[HttpPut]
+	[HttpPut("{id}")]
 	public async Task<IActionResult> UpdateAsync(int id, UpdateProductRequest request)
 	{
 		var serviceResult = await productService.UpdateAsync(id, request);
 		return CreateActionResult(serviceResult);
 	}
 
-	[HttpDelete]
+	[HttpDelete("{id}")]
 	public async Task<IActionResult> DeleteAsync(int id)
 	{
 		var serviceResult = await productService.DeleteAsync(id);

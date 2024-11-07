@@ -29,7 +29,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 		var product = await productRepository.GetByIdAsync(id);
 
 		if (product is null)
-			ServiceResult<ProductDto>.Fail("product not found", HttpStatusCode.NotFound);
+			return ServiceResult<ProductDto?>.Fail("product not found", HttpStatusCode.NotFound);
 
 		var productDto = new ProductDto(product!.Id, product.Name, product.Price, product.Stock);
 		return ServiceResult<ProductDto>.Success(productDto)!;
@@ -86,6 +86,4 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 		await unitOfWork.SaveChangesAsync();
 		return ServiceResult.Success(HttpStatusCode.NoContent);
 	}
-
-
 }
