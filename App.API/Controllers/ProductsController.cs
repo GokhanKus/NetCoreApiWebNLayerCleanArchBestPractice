@@ -39,6 +39,13 @@ public class ProductsController(IProductService productService) : CustomBaseCont
 		return CreateActionResult(serviceResult);
 	}
 
+	[HttpPatch("stock")]
+	public async Task<IActionResult> UpdateStockAsync(UpdateProductStockRequest request)
+	{
+		var serviceResult = await productService.UpdateStockAsync(request);
+		return CreateActionResult(serviceResult);
+	}
+
 	[HttpDelete("{id}")]
 	public async Task<IActionResult> DeleteAsync(int id)
 	{
