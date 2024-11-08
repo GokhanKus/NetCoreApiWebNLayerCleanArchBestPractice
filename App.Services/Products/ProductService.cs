@@ -14,6 +14,12 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 		var productsDto = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Stock)).ToList();
 		return ServiceResult<List<ProductDto>>.Success(productsDto);
 	}
+	public async Task<ServiceResult<List<ProductDto>>> GetAllPagedAsync(int pageNumber, int pageSize)
+	{
+		var products = await productRepository.GetAll().Skip((pageNumber-1)*pageSize).Take(pageSize).ToListAsync();
+		var productsDto = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Stock)).ToList();
+		return ServiceResult<List<ProductDto>>.Success(productsDto);
+	}
 	public async Task<ServiceResult<List<ProductDto>>> GetTopPriceProductsAsync(int count)
 	{
 		var products = await productRepository.GetTopPriceProductAsync(count);
@@ -86,4 +92,5 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 		await unitOfWork.SaveChangesAsync();
 		return ServiceResult.Success(HttpStatusCode.NoContent);
 	}
+
 }
