@@ -1,11 +1,16 @@
 using App.Repositories.Extensions;
+using App.Services;
 using App.Services.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers(options =>
+{
+	options.Filters.Add<FluentValidationFilter>();
+	options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+});
 
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -15,7 +20,6 @@ builder.Services.AddRepositories(builder.Configuration).AddServices();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();

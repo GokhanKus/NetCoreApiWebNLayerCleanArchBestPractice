@@ -7,7 +7,6 @@ public class CreateProductRequestValidator : AbstractValidator<CreateProductRequ
     public CreateProductRequestValidator()
     {
         RuleFor(x => x.Name)
-            .NotNull().WithMessage("product name cannot be null")
             .NotEmpty().WithMessage("product name is required")
             .Length(2, 50).WithMessage("product name must be between 2,50");
 
