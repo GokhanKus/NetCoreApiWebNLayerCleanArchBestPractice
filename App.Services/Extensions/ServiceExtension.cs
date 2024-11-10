@@ -14,6 +14,8 @@ public static class ServiceExtension
 		services.AddFluentValidationAutoValidation();
 		services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
+		services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
 		return services;
 	}
 }
