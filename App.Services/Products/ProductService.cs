@@ -1,11 +1,10 @@
 ﻿using App.Repositories;
 using App.Repositories.Products;
-using App.Services.ExceptionHandler;
 using App.Services.Products.Create;
 using App.Services.Products.Update;
+using App.Services.Products.UpdateStock;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 
 namespace App.Services.Products;
@@ -53,7 +52,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 	}
 	public async Task<ServiceResult<CreateProductResponse>> CreateAsync(CreateProductRequest request)
 	{
-		throw new CriticalException("kritik bir hata meydana geldi");
+		//throw new CriticalException("kritik bir hata meydana geldi");
 		//async manuel service business check
 		var anyProduct = await productRepository.Where(p => p.Name == request.Name).AnyAsync();
 		if (anyProduct)
@@ -89,6 +88,10 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 
 		if (product is null)
 			return ServiceResult.Fail("product not found", HttpStatusCode.NotFound);
+
+		var isProductNameExist = await productRepository.Where(p => p.Name == request.Name && p.Id != product.Id).AnyAsync();
+		if (isProductNameExist)
+			return ServiceResult.Fail("product name is already exists in database");
 
 		var productDto = mapper.Map(request, product);
 		#region manuel mapping
