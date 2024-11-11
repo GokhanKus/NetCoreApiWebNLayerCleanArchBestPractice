@@ -58,12 +58,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 		if (anyProduct)
 			return ServiceResult<CreateProductResponse>.Fail("product name is already exists in database");
 
-		var product = new Product
-		{
-			Name = request.Name,
-			Price = request.Price,
-			Stock = request.Stock
-		};
+		var product = mapper.Map<Product>(request);
 
 		await productRepository.AddAsync(product);
 		await unitOfWork.SaveChangesAsync();
