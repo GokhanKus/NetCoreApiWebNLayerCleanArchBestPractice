@@ -95,7 +95,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 		//product.Stock = request.Stock;
 		#endregion
 
-		productRepository.Update(product);
+		productRepository.Update(productDto);
 		await unitOfWork.SaveChangesAsync();
 		return ServiceResult.Success(HttpStatusCode.NoContent);
 	}
