@@ -20,6 +20,8 @@ builder.Services.AddRepositories(builder.Configuration).AddServices();
 
 var app = builder.Build();
 
+app.UseExceptionHandler(x => { });
+
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
