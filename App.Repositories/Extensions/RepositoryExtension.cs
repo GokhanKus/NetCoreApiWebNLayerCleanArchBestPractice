@@ -1,4 +1,5 @@
 ﻿using App.Repositories.Categories;
+using App.Repositories.Interceptors;
 using App.Repositories.Products;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,7 @@ public static class RepositoryExtension
 			{
 				sqlServerOptionsAction.MigrationsAssembly(typeof(RepositoryAssembly).Assembly.FullName);
 			});
+			x.AddInterceptors(new AuditDbContextInterceptor());
 		});
 		//ilerde reflection kullanarak sonu repository ile bitenlerin IoC kaydini otomatik yapacagiz yoksa 40 tane olsa 40 kere addscoped & singleton mu yazacagiz..
 		services.AddScoped<IProductRepository, ProductRepository>();
