@@ -1,4 +1,6 @@
-﻿using App.Services.Products;
+﻿using App.Repositories.Products;
+using App.Services.Filters;
+using App.Services.Products;
 using App.Services.Products.Create;
 using App.Services.Products.Update;
 using App.Services.Products.UpdateStock;
@@ -21,6 +23,7 @@ public class ProductsController(IProductService productService) : CustomBaseCont
 		return CreateActionResult(serviceResult);
 	}
 
+	[ServiceFilter(typeof(NotFoundFilter<Product, int>))]
 	[HttpGet("{id:int}")]
 	public async Task<IActionResult> GetByIdAsync(int id)
 	{
@@ -35,6 +38,7 @@ public class ProductsController(IProductService productService) : CustomBaseCont
 		return CreateActionResult(serviceResult);
 	}
 
+	[ServiceFilter(typeof(NotFoundFilter<Product, int>))]
 	[HttpPut("{id:int}")]
 	public async Task<IActionResult> UpdateAsync(int id, UpdateProductRequest request)
 	{
@@ -49,6 +53,7 @@ public class ProductsController(IProductService productService) : CustomBaseCont
 		return CreateActionResult(serviceResult);
 	}
 
+	[ServiceFilter(typeof(NotFoundFilter<Product,int>))]
 	[HttpDelete("{id:int}")]
 	public async Task<IActionResult> DeleteAsync(int id)
 	{

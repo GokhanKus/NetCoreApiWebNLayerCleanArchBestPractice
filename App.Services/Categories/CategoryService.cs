@@ -20,9 +20,6 @@ public class CategoryService(ICategoryRepository categoryRepository, IUnitOfWork
 	{
 		var category = await categoryRepository.GetCategoryWithProductsAsync(categoryId);
 
-		if (category is null)
-			return ServiceResult<CategoryWithProductsDto>.Fail("category not found.", HttpStatusCode.NotFound);
-
 		var categoryAsDto = mapper.Map<CategoryWithProductsDto>(category);
 
 		return ServiceResult<CategoryWithProductsDto>.Success(categoryAsDto);
@@ -38,9 +35,6 @@ public class CategoryService(ICategoryRepository categoryRepository, IUnitOfWork
 	public async Task<ServiceResult<CategoryDto>> GetByIdAsync(int id)
 	{
 		var category = await categoryRepository.GetByIdAsync(id);
-
-		if (category is null)
-			return ServiceResult<CategoryDto>.Fail("category not found.", HttpStatusCode.NotFound);
 
 		var categoryAsDto = mapper.Map<CategoryDto>(category);
 
@@ -61,17 +55,12 @@ public class CategoryService(ICategoryRepository categoryRepository, IUnitOfWork
 	}
 	public async Task<ServiceResult> UpdateAsync(int id, UpdateCategoryRequest request)
 	{
-		var category = await categoryRepository.GetByIdAsync(id);
-
-		if (category is null)
-			return ServiceResult.Fail("category not found", HttpStatusCode.NotFound);
-
-		var isProductNameExist = await categoryRepository.Where(p => p.Name == request.Name && p.Id != category.Id).AnyAsync();
-		if (isProductNameExist)
+		var isCategoryNameExist = await categoryRepository.Where(p => p.Name == request.Name && p.Id != id).AnyAsync();
+		if (isCategoryNameExist)
 			return ServiceResult.Fail("category name is already exists in database");
 
-
-		category = mapper.Map(request, category);
+		var category = mapper.Map<Category>(request);
+		category.Id = id;
 
 		categoryRepository.Update(category);
 		await unitOfWork.SaveChangesAsync();
@@ -82,10 +71,7 @@ public class CategoryService(ICategoryRepository categoryRepository, IUnitOfWork
 	{
 		var category = await categoryRepository.GetByIdAsync(id);
 
-		if (category is null)
-			return ServiceResult.Fail("category not found", HttpStatusCode.NotFound);
-
-		categoryRepository.Delete(category);
+		categoryRepository.Delete(category!);
 		await unitOfWork.SaveChangesAsync();
 		return ServiceResult.Success(HttpStatusCode.NoContent);
 	}

@@ -22,7 +22,7 @@ public static class RepositoryExtension
 		//ilerde reflection kullanarak sonu repository ile bitenlerin IoC kaydini otomatik yapacagiz yoksa 40 tane olsa 40 kere addscoped & singleton mu yazacagiz..
 		services.AddScoped<IProductRepository, ProductRepository>();
 		services.AddScoped<ICategoryRepository, CategoryRepository>();
-		services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+		services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
 		services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 		return services;

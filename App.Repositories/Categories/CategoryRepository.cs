@@ -1,9 +1,7 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace App.Repositories.Categories;
-public class CategoryRepository(AppDbContext context) : GenericRepository<Category>(context), ICategoryRepository
+public class CategoryRepository(AppDbContext context) : GenericRepository<Category, int>(context), ICategoryRepository
 {
 	public IQueryable<Category> GetCategoryWithProducts()
 	{

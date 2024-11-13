@@ -4,6 +4,8 @@ using App.Services.Categories.Update;
 using App.Services.Categories;
 using Microsoft.AspNetCore.Mvc;
 using App.Services;
+using Microsoft.Extensions.FileProviders;
+using App.Services.Filters;
 
 namespace App.API.Controllers;
 public class CategoriesController(ICategoryService categoryService) : CustomBaseController
@@ -15,6 +17,7 @@ public class CategoriesController(ICategoryService categoryService) : CustomBase
 		return CreateActionResult(serviceResult);
 	}
 
+	[ServiceFilter(typeof(NotFoundFilter<Category, int>))]
 	[HttpGet("{id}")]
 	public async Task<IActionResult> GetCategory(int id)
 	{
@@ -29,6 +32,7 @@ public class CategoriesController(ICategoryService categoryService) : CustomBase
 		return CreateActionResult(serviceResult);
 	}
 
+	[ServiceFilter(typeof(NotFoundFilter<Category, int>))]
 	[HttpGet("{id}/products")]
 	public async Task<IActionResult> GetCategoryWithProducts(int id)
 	{
@@ -43,6 +47,7 @@ public class CategoriesController(ICategoryService categoryService) : CustomBase
 		return CreateActionResult(serviceResult);
 	}
 
+	[ServiceFilter(typeof(NotFoundFilter<Category, int>))]
 	[HttpPut("{id}")]
 	public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryRequest request)
 	{
@@ -50,6 +55,7 @@ public class CategoriesController(ICategoryService categoryService) : CustomBase
 		return CreateActionResult(serviceResult);
 	}
 
+	[ServiceFilter(typeof(NotFoundFilter<Category, int>))]
 	[HttpDelete("{id}")]
 	public async Task<IActionResult> DeleteCategory(int id)
 	{

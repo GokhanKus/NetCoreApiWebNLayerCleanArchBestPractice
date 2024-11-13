@@ -43,9 +43,6 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 	{
 		var product = await productRepository.GetByIdAsync(id);
 
-		if (product is null)
-			return ServiceResult<ProductDto?>.Fail("product not found", HttpStatusCode.NotFound);
-
 		//var productDto = new ProductDto(product!.Id, product.Name, product.Price, product.Stock); manuel mapping
 		var productDto = mapper.Map<ProductDto>(product);
 		return ServiceResult<ProductDto>.Success(productDto)!;
@@ -79,23 +76,14 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 
 		#endregion
 
-		var product = await productRepository.GetByIdAsync(id);
-
-		if (product is null)
-			return ServiceResult.Fail("product not found", HttpStatusCode.NotFound);
-
-		var isProductNameExist = await productRepository.Where(p => p.Name == request.Name && p.Id != product.Id).AnyAsync();
+		var isProductNameExist = await productRepository.Where(p => p.Name == request.Name && p.Id != id).AnyAsync();
 		if (isProductNameExist)
 			return ServiceResult.Fail("product name is already exists in database");
 
-		var productDto = mapper.Map(request, product);
-		#region manuel mapping
-		//product.Name = request.Name;
-		//product.Price = request.Price;
-		//product.Stock = request.Stock;
-		#endregion
+		var product = mapper.Map<Product>(request);
+		product.Id = id;
 
-		productRepository.Update(productDto);
+		productRepository.Update(product);
 		await unitOfWork.SaveChangesAsync();
 		return ServiceResult.Success(HttpStatusCode.NoContent);
 	}
@@ -116,10 +104,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 	{
 		var product = await productRepository.GetByIdAsync(id);
 
-		if (product is null)
-			return ServiceResult.Fail("product not found", HttpStatusCode.NotFound);
-
-		productRepository.Delete(product);
+		productRepository.Delete(product!);
 		await unitOfWork.SaveChangesAsync();
 		return ServiceResult.Success(HttpStatusCode.NoContent);
 	}
