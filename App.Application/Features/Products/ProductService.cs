@@ -1,4 +1,5 @@
-﻿using App.Application.Contracts.Persistence;
+﻿using App.Application.Contracts.Caching;
+using App.Application.Contracts.Persistence;
 using App.Application.Features.Products.Create;
 using App.Application.Features.Products.Dto;
 using App.Application.Features.Products.Update;
@@ -9,15 +10,23 @@ using System.Net;
 
 namespace App.Application.Features.Products;
 
-public class ProductService(IProductRepository productRepository, IUnitOfWork unitOfWork, IMapper mapper) : IProductService
+public class ProductService(IProductRepository productRepository, IUnitOfWork unitOfWork, IMapper mapper,ICacheService cacheService) : IProductService
 {
+	private const string ProductListCacheKey = "ProductListCacheKey";
 	public async Task<ServiceResult<List<ProductDto>>> GetAllAsync()
 	{
+		//cachelemeyi bu sekilde yapmak yerine decorator veya proxy desing pattern'ı ile yapmak daha iyi olur (Training web api projemde yapmıstım)
 		//List<> tipinde bir sey alirken null kontrolü yapmasak da olur gelmezse bos liste gelecektir if ile kalabalik yapilmayabilir
+		var productListAsCached = await cacheService.GetAsync<List<ProductDto>>(ProductListCacheKey);
+		if (productListAsCached is not null) return ServiceResult<List<ProductDto>>.Success(productListAsCached);
+
 		var products = await productRepository.GetAllAsync();
+
 
 		//var productsDto = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Stock)).ToList(); manuel mapping
 		var productsDto = mapper.Map<List<ProductDto>>(products);
+
+		await cacheService.AddAsync(ProductListCacheKey, productsDto, TimeSpan.FromDays(1));
 		return ServiceResult<List<ProductDto>>.Success(productsDto);
 	}
 	public async Task<ServiceResult<List<ProductDto>>> GetAllPagedAsync(int pageNumber, int pageSize)

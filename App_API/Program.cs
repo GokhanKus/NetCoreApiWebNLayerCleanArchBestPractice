@@ -1,4 +1,6 @@
+using App.Application.Contracts.Caching;
 using App.Application.Extensions;
+using App.Caching;
 using App.Persistence.Extensions;
 using App_API.ExceptionHandler;
 using App_API.Filters;
@@ -20,6 +22,8 @@ builder.Services.AddRepositories(builder.Configuration).AddServices();
 builder.Services.AddScoped(typeof(NotFoundFilter<,>));//ctorda parametre alan bagimli bir class oldugu icin IOC kaydi yapilir
 builder.Services.AddExceptionHandler<CriticalExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICacheService, CacheService>();
 
 var app = builder.Build();
 
