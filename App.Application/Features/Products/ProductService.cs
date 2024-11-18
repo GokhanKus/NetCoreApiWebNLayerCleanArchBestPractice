@@ -1,16 +1,18 @@
 ﻿using App.Application.Contracts.Caching;
 using App.Application.Contracts.Persistence;
+using App.Application.Contracts.ServiceBus;
 using App.Application.Features.Products.Create;
 using App.Application.Features.Products.Dto;
 using App.Application.Features.Products.Update;
 using App.Application.Features.Products.UpdateStock;
 using App.Domain.Entities;
+using App.Domain.Event;
 using AutoMapper;
 using System.Net;
 
 namespace App.Application.Features.Products;
 
-public class ProductService(IProductRepository productRepository, IUnitOfWork unitOfWork, IMapper mapper,ICacheService cacheService) : IProductService
+public class ProductService(IProductRepository productRepository, IUnitOfWork unitOfWork, IMapper mapper,ICacheService cacheService,IServiceBus serviceBus) : IProductService
 {
 	private const string ProductListCacheKey = "ProductListCacheKey";
 	public async Task<ServiceResult<List<ProductDto>>> GetAllAsync()
@@ -69,6 +71,7 @@ public class ProductService(IProductRepository productRepository, IUnitOfWork un
 
 		await productRepository.AddAsync(product);
 		await unitOfWork.SaveChangesAsync();
+		await serviceBus.PublishAsync(new ProductAddedEvent(product.Id, product.Name, product.Price));
 		return ServiceResult<CreateProductResponse>.SuccessAsCreated(new CreateProductResponse(product.Id), $"api/products/{product.Id}");
 	}
 	public async Task<ServiceResult> UpdateAsync(int id, UpdateProductRequest request)
